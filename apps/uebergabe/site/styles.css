@@ -80,7 +80,7 @@ h2, h3 { letter-spacing: -.025em; }
 .prose p:last-child { margin-bottom: 0; }
 .prose li { color: #4a5b50; padding-bottom: 8px; }
 .prose ul { padding-left: 22px; }
-.prose address { font-style: normal; color: #4a5b50; }
+.prose address { font-style: normal; color: #4a5b50; white-space: pre-line; }
 .prose address .placeholder { white-space: pre-line; }
 .contact-box, .note-box { background: var(--sage); border-radius: 17px; padding: 24px; margin: 22px 0; }
 .contact-box .eyebrow { color: var(--forest); margin-bottom: 8px; }

@@ -1,14 +1,15 @@
 {
-  "publisherName": null,
-  "copyrightHolder": null,
-  "publisherPostalAddress": null,
-  "supportEmail": null,
+  "publisherName": "Leo Schoberwalter und Felix Schoberwalter",
+  "copyrightHolder": "Leo Schoberwalter und Felix Schoberwalter",
+  "publisherPostalAddress": "Leo Schoberwalter\nStresemannstr. 72\n10963 Berlin\nDeutschland\n\nFelix Schoberwalter\nSpeyerer Str. 3\n68199 Mannheim\nDeutschland",
+  "supportEmail": "leoschoberwalter@gmail.com",
   "publicLegalDetails": null,
-  "supportMailProvider": null,
-  "supportRetentionPolicy": null,
-  "supportPrivacyDetails": null,
-  "websitePrivacyBasis": null,
-  "applicablePrivacyRightsAndSupervisoryAuthority": null,
+  "supportMailProvider": "Gmail, angeboten im Europäischen Wirtschaftsraum von Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland.",
+  "supportRetentionPolicy": "Wir bewahren Anfragen und Anhänge auf, solange sie zur Bearbeitung erforderlich sind. Danach löschen wir sie, soweit keine gesetzlichen Aufbewahrungspflichten oder konkret erforderlichen Nachweise für Rechtsansprüche entgegenstehen. Solche Nachweise speichern wir nur für den jeweiligen Aufbewahrungs- oder Verjährungszeitraum und beschränken ihre Verwendung auf diesen Zweck.",
+  "supportPrivacyDetails": "Anfragen zur Nutzung der App bearbeiten wir auf Grundlage von Art. 6 Abs. 1 lit. b DSGVO, soweit dies für das Nutzungsverhältnis oder vorvertragliche Maßnahmen erforderlich ist. Für andere Anfragen ist Art. 6 Abs. 1 lit. f DSGVO die Grundlage: unser berechtigtes Interesse, Fragen zu beantworten und Probleme zu klären. Soweit gesetzliche Aufbewahrungspflichten bestehen, gilt Art. 6 Abs. 1 lit. c DSGVO.",
+  "websitePrivacyBasis": "Die technische Bereitstellung und Absicherung dieser Website erfolgt auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO. Unser berechtigtes Interesse ist ein erreichbares, funktionsfähiges und gegen Missbrauch geschütztes Informationsangebot zur App.",
+  "applicablePrivacyRightsAndSupervisoryAuthority": "Nach Maßgabe der DSGVO hast du Rechte auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung und Datenübertragbarkeit (Art. 15–20 DSGVO). Eine erteilte Einwilligung kannst du mit Wirkung für die Zukunft widerrufen. Du kannst dich bei einer Datenschutzaufsichtsbehörde beschweren, insbesondere an deinem gewöhnlichen Aufenthaltsort, Arbeitsplatz oder am Ort des vermuteten Verstoßes (Art. 77 DSGVO).",
   "appStoreURL": null,
-  "lastUpdated": "2026-09-20"
+  "lastUpdated": "2026-09-20",
+  "secondarySupportEmail": "schoberwalterfelix@gmail.com"
 }

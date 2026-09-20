@@ -19,6 +19,8 @@ class SiteBuildTests(unittest.TestCase):
         self.root = Path(self.temp.name)
         self.app = self.root / "apps/uebergabe"
         shutil.copytree(builder.ROOT / "apps/uebergabe", self.app)
+        shutil.copyfile(self.app / "config.example.json", self.app / "config.json")
+        self.manifest(status="draft")
         shutil.copytree(builder.ROOT / "root", self.root / "root")
 
     def manifest(self, **changes):
@@ -34,6 +36,7 @@ class SiteBuildTests(unittest.TestCase):
             "copyrightHolder": "Muster & Partner",
             "publisherPostalAddress": "Musterstraße 5, 10115 Berlin",
             "supportEmail": "support@schobebro.de",
+            "secondarySupportEmail": "team@schobebro.de",
             "lastUpdated": "2026-09-20",
             "publicLegalDetails": None,
             "appStoreURL": None,
@@ -64,7 +67,7 @@ class SiteBuildTests(unittest.TestCase):
         self.assertNotIn("Website in Vorbereitung", landing)
         self.assertFalse((output / "sitemap.xml").exists())
         self.assertNotIn("Sitemap:", (output / "robots.txt").read_text())
-        self.assertIn("Noch offen: Name des Anbieters", (output / "uebergabe/imprint.html").read_text())
+        self.assertIn("Noch offen: Anschrift", (output / "uebergabe/imprint.html").read_text())
 
     def test_root_is_only_redirect_without_shared_portal(self):
         unused_portal = self.root / "portal"
@@ -101,12 +104,26 @@ class SiteBuildTests(unittest.TestCase):
             self.assertNotIn('class="draft"', text)
             canonical = "https://schobebro.github.io/uebergabe/" + ("" if name == "index.html" else name)
             self.assertIn(f'rel="canonical" href="{canonical}"', text)
-        privacy = (output / "uebergabe/privacy.html").read_text()
-        self.assertIn("Muster &amp; Partner &lt;Büro&gt; &quot;Nord&quot;", privacy)
-        self.assertNotIn("<Büro>", privacy)
-        self.assertIn("© 2026", privacy)
+        terms = (output / "uebergabe/terms.html").read_text()
+        self.assertIn("Muster &amp; Partner &lt;Büro&gt; &quot;Nord&quot;", terms)
+        self.assertNotIn("<Büro>", terms)
+        self.assertIn("© 2026", terms)
+        contact = (output / "uebergabe/imprint.html").read_text()
+        self.assertIn('href="mailto:team@schobebro.de"', contact)
         self.assertEqual((output / "sitemap.xml").read_text().count("<url>"), 5)
         self.assertNotIn("<loc>https://schobebro.github.io/</loc>", (output / "sitemap.xml").read_text())
+
+    def test_optional_second_contact_can_be_omitted_and_rejects_invalid_email(self):
+        self.manifest(status="published")
+        config = self.valid_config()
+        config["secondarySupportEmail"] = None
+        (self.app / "config.json").write_text(json.dumps(config))
+        output = builder.build(self.root)
+        self.assertNotIn('mailto:team@schobebro.de', (output / "uebergabe/imprint.html").read_text())
+        config["secondarySupportEmail"] = "not-an-email"
+        (self.app / "config.json").write_text(json.dumps(config))
+        with self.assertRaisesRegex(ValueError, "secondarySupportEmail"):
+            builder.build(self.root)
 
     def test_multiple_apps_keep_pages_assets_and_indexing_independent(self):
         second = self.root / "apps/zweite-app"

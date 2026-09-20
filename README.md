@@ -45,15 +45,16 @@ Die lokale Vorschau unter http://127.0.0.1:4181/uebergabe/ markiert alle Seiten 
 
 ## Aktueller Stand: Übergabe
 
-`apps/uebergabe/app.json` steht auf `"status": "draft"`. Trotzdem wird die vollständige Übergabe-Website mit allen fünf Seiten — Start, Support, Datenschutz, Nutzungsbedingungen und Impressum — eingebunden. Der Status kennzeichnet die noch offenen Betreiber-/Kontaktangaben; er ersetzt die Website nicht durch eine Vorbereitungsseite. Links und Assets bleiben vollständig innerhalb von `/uebergabe/`.
+`apps/uebergabe/app.json` steht auf `"status": "published"`. Die vollständige Website mit Start, Support, Datenschutz, Nutzungsbedingungen und Impressum enthält die angegebenen Betreiberanschriften und beide Kontaktadressen. Gemeinsame Verantwortung, Gmail, GitHub Pages, lokale Speicherung und Apple-Systemdienste sind beschrieben. [Grundlage und Betriebshinweise](apps/uebergabe/LEGAL-NOTES.md). Links und Assets bleiben innerhalb von `/uebergabe/`.
 
-Für die Fertigstellung der Kontakt- und Rechtstexte fehlen die tatsächlichen Betreiber- und Datenschutzangaben in `apps/uebergabe/config.json`:
+Die öffentlichen Betreiber- und Datenschutzangaben werden in `apps/uebergabe/config.json` gepflegt:
 
 | Feld | Öffentlich angezeigter Inhalt |
 | --- | --- |
 | `publisherName` | Rechtlich verantwortlicher Anbieter |
 | `publisherPostalAddress` | Vollständige öffentliche Anschrift |
 | `supportEmail` | Öffentliche Kontakt-E-Mail |
+| `secondarySupportEmail` | Optional zweite öffentliche Kontakt-E-Mail |
 | `supportMailProvider` | Tatsächlich verwendeter E-Mail-Dienst |
 | `supportRetentionPolicy` | Aufbewahrung und Löschung von Support-Anfragen |
 | `supportPrivacyDetails` | Anwendbare Rechtsgrundlage, Empfänger und Übermittlungen beim Support |

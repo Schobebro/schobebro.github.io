@@ -27,6 +27,7 @@ FIELDS = {
     "COPYRIGHT_HOLDER": "copyrightHolder",
     "PUBLISHER_POSTAL_ADDRESS": "publisherPostalAddress",
     "PUBLIC_SUPPORT_EMAIL": "supportEmail",
+    "SECONDARY_SUPPORT_EMAIL": "secondarySupportEmail",
     "PUBLIC_LEGAL_DETAILS": "publicLegalDetails",
     "LAST_UPDATED": "lastUpdated",
     "SUPPORT_MAIL_PROVIDER": "supportMailProvider",
@@ -35,7 +36,7 @@ FIELDS = {
     "WEBSITE_PRIVACY_BASIS": "websitePrivacyBasis",
     "APPLICABLE_PRIVACY_RIGHTS_AND_SUPERVISORY_AUTHORITY": "applicablePrivacyRightsAndSupervisoryAuthority",
 }
-OPTIONAL = {"publicLegalDetails"}
+OPTIONAL = {"publicLegalDetails", "secondarySupportEmail"}
 DRAFT = '<p class="draft">Entwurf · Diese Informationen werden noch vervollständigt. Offene Angaben sind gekennzeichnet.</p>'
 PREVIEW = '<p class="draft">Vorschau · Diese Ansicht dient zur Prüfung. Offene Angaben sind gekennzeichnet.</p>'
 FIELD_LABELS = {
@@ -102,10 +103,13 @@ def validate_config(config):
     missing = sorted(key for key in required if is_placeholder(config.get(key)))
     if missing:
         raise ValueError("Herausgeber-/Datenschutzangaben fehlen: " + ", ".join(missing))
-    email = config["supportEmail"].strip()
-    if not re.fullmatch(r'[^\s@<>:?&#"]+@[^\s@<>]+\.[^\s@<>]+', email):
-        raise ValueError("supportEmail: gültige öffentliche Kontakt-E-Mail fehlt")
-    public_https("https://" + email.split("@", 1)[1], "supportEmail")
+    for field in ("supportEmail", "secondarySupportEmail"):
+        if field == "secondarySupportEmail" and not config.get(field):
+            continue
+        email = config[field].strip()
+        if not re.fullmatch(r'[^\s@<>:?&#"]+@[^\s@<>]+\.[^\s@<>]+', email):
+            raise ValueError(f"{field}: gültige öffentliche Kontakt-E-Mail fehlt")
+        public_https("https://" + email.split("@", 1)[1], field)
     for key in OPTIONAL:
         extra = config.get(key)
         if extra is not None and is_placeholder(extra):
