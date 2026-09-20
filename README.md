@@ -1,14 +1,15 @@
 # Schobebro · App-Websites
 
-Öffentliche Websites, Hilfe und rechtliche Informationen für die Apps von Schobebro. Eine gemeinsame GitHub-Pages-Website, ein Verzeichnis pro App. **Dieses Repository enthält ausschließlich Website-Dateien; App-Quellcode bleibt in den jeweiligen privaten Repositories.**
+Ein gemeinsames Repository für eigenständige App-Websites. Jede App hat ihre eigene Startseite, Gestaltung, Navigation, Hilfe und Rechtstexte unter einem eigenen URL-Pfad. Es gibt keine gemeinsame App-Übersicht. **Dieses Repository enthält ausschließlich Website-Dateien; App-Quellcode bleibt in den jeweiligen privaten Repositories.**
 
-- **Startseite:** https://schobebro.github.io/
-- **Übergabe:** https://schobebro.github.io/uebergabe/
+- **Übergabe-Website:** https://schobebro.github.io/uebergabe/
+- `https://schobebro.github.io/` leitet direkt zu Übergabe weiter.
+- Weitere Websites werden unabhängig unter `/app-name/` ergänzt.
 
 ## Aufbau
 
 ```text
-portal/                    Gemeinsame Startseite, Styles und Icon
+root/index.html            Weiterleitung zu Übergabe, keine gemeinsame Website
 apps/
   uebergabe/
     app.json               Name, Beschreibung, URL-Pfad und Veröffentlichungsstatus
@@ -33,20 +34,20 @@ python3 scripts/build.py
 python3 -m http.server 4180 --bind 127.0.0.1 --directory build/site
 ```
 
-Unter http://127.0.0.1:4180/ siehst du genau die Dateien, die veröffentlicht werden. Für die vollständigen Entwürfe:
+Unter http://127.0.0.1:4180/uebergabe/ siehst du die eigenständige Übergabe-Website. Für die ausdrücklich markierte lokale Vorschau:
 
 ```sh
 python3 scripts/build.py --preview
 python3 -m http.server 4181 --bind 127.0.0.1 --directory build/preview
 ```
 
-Die Vorschau unter http://127.0.0.1:4181/ enthält auch unfertige Rechtsseiten. Diese sind sichtbar als Entwurf und mit `noindex` markiert. Die Vorschau ist ein lokales/CI-Prüfartefakt und wird **nicht** auf GitHub Pages veröffentlicht.
+Die lokale Vorschau unter http://127.0.0.1:4181/uebergabe/ markiert alle Seiten als Vorschau. Der reguläre Build enthält ebenfalls alle fünf Seiten. Solange die Betreiberangaben noch unvollständig sind, bleiben Kontakt- und Rechtsseiten sichtbar als Entwurf gekennzeichnet und die gesamte App-Website trägt `noindex`. Die lokale Vorschau ist ein separates CI-Prüfartefakt.
 
 ## Aktueller Stand: Übergabe
 
-`apps/uebergabe/app.json` steht auf `"status": "draft"`. Der öffentliche Build enthält dort eine kurze Vorbereitungsseite. Die vollständigen fünf Seiten — Start, Support, Datenschutz, Nutzungsbedingungen und Impressum — sind im Quellverzeichnis und in der Vorschau vorbereitet.
+`apps/uebergabe/app.json` steht auf `"status": "draft"`. Trotzdem wird die vollständige Übergabe-Website mit allen fünf Seiten — Start, Support, Datenschutz, Nutzungsbedingungen und Impressum — eingebunden. Der Status kennzeichnet die noch offenen Betreiber-/Kontaktangaben; er ersetzt die Website nicht durch eine Vorbereitungsseite. Links und Assets bleiben vollständig innerhalb von `/uebergabe/`.
 
-Für die Veröffentlichung der vollständigen Website fehlen die tatsächlichen Betreiber- und Datenschutzangaben in `apps/uebergabe/config.json`:
+Für die Fertigstellung der Kontakt- und Rechtstexte fehlen die tatsächlichen Betreiber- und Datenschutzangaben in `apps/uebergabe/config.json`:
 
 | Feld | Öffentlich angezeigter Inhalt |
 | --- | --- |
@@ -67,14 +68,14 @@ Für die Veröffentlichung der vollständigen Website fehlen die tatsächlichen 
 
 Erst wenn die Angaben und Texte zu Anbieter, App und Betrieb passen, `status` auf `published` setzen. `python3 scripts/build.py` prüft Vollständigkeit, Platzhalter, öffentliche Adressen, interne Dateien und Anker. HTML-Werte werden sicher escaped. Diese technische Prüfung ersetzt keine Prüfung der tatsächlichen Angaben und anwendbaren rechtlichen Anforderungen.
 
-Danach entstehen die App-Store-Adressen:
+Die Seiten haben jeweils eigene direkte Adressen:
 
 - Support: https://schobebro.github.io/uebergabe/support.html
 - Datenschutz: https://schobebro.github.io/uebergabe/privacy.html
 - Nutzungsbedingungen: https://schobebro.github.io/uebergabe/terms.html
 - Impressum: https://schobebro.github.io/uebergabe/imprint.html
 
-Solange der Status `draft` ist, werden diese vier Seiten absichtlich nicht ausgeliefert. Sie sind noch keine verwendbaren App-Store-URLs.
+Solange der Status `draft` ist, zeigen Kontakt- und Rechtsseiten einen Entwurfshinweis. Fehlende E-Mail-Adressen sind keine anklickbaren Kontaktlinks. Die Texte müssen vor der Verwendung im App-Store-Release fertiggestellt werden.
 
 ## Weitere App hinzufügen
 
@@ -83,13 +84,13 @@ Solange der Status `draft` ist, werden diese vier Seiten absichtlich nicht ausge
 3. In `config.json` die öffentlichen Angaben passend zur App ergänzen. Die URLs leitet der Builder automatisch aus dem Slug ab.
 4. Alle fünf HTML-Seiten, Bilder, Favicon und Rechtstexte tatsächlich auf die neue App anpassen. Insbesondere sind Angaben zu Datenspeicherung, Berechtigungen und Drittanbietern app-spezifisch.
 5. Beide Builds prüfen und die Vorschau auf Desktop und Mobilgerät ansehen. Für zusätzliche Assets die explizite Dateiliste `APP_FILES` in `scripts/build.py` erweitern.
-6. Sobald die vollständige Website bereit ist, `status` auf `published` setzen und auf `main` committen. Die Startseite erhält die App-Kachel automatisch; die Website liegt unter `/meine-app/`.
+6. Auf `main` committen: die vollständige eigenständige Website liegt unter `/meine-app/`. Sobald alle Angaben und Texte fertig sind, `status` auf `published` setzen; die Entwurfshinweise entfallen nach erfolgreicher Validierung.
 
-Es gibt bewusst keine zweite Liste von App-Links, die parallel gepflegt werden müsste. Alle relativen Links innerhalb einer App funktionieren unter ihrem Unterverzeichnis.
+Es werden keine App-Kacheln, gemeinsame Navigation oder Querverlinkungen erzeugt. Alle relativen Links innerhalb einer App funktionieren unter ihrem Unterverzeichnis. Die Root-Weiterleitung bleibt ausdrücklich auf Übergabe gerichtet und ändert sich nicht automatisch, wenn eine weitere App hinzukommt.
 
 ## GitHub Pages
 
-Repository: **Schobebro/schobebro.github.io**. In **Settings → Pages** ist **GitHub Actions** die Veröffentlichungsquelle. Weil das Repository nach der Organisation benannt ist, liegt die gemeinsame Startseite direkt unter `https://schobebro.github.io/`.
+Repository: **Schobebro/schobebro.github.io**. In **Settings → Pages** ist **GitHub Actions** die Veröffentlichungsquelle. Die eigenständigen Websites teilen sich ausschließlich das Hosting unter `https://schobebro.github.io/`. `root/index.html` ist lediglich eine Weiterleitung.
 
 Der Workflow **Websites · GitHub Pages**:
 

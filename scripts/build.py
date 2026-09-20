@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Build the public multi-app website with no third-party dependencies.
+"""Build independent app websites with no third-party dependencies.
 
-Only allowlisted website files enter build/site. Draft apps expose one truthful
-holding page. Full legal/support pages require an explicitly published manifest
-and validated public operator details. --preview is local-only and noindex.
+Only allowlisted website files enter build/site. Every app has its own complete
+website. Draft legal/support pages identify incomplete information; all draft
+pages stay noindex. Published apps require validated public operator details.
 """
 import argparse
 from datetime import date
@@ -21,7 +21,6 @@ ROOT = Path(__file__).resolve().parents[1]
 BASE_URL = "https://schobebro.github.io/"
 PAGES = ("index.html", "support.html", "privacy.html", "terms.html", "imprint.html")
 APP_FILES = ("styles.css", "script.js", "favicon.svg", ".nojekyll", "assets/app-comparison.png")
-PORTAL_FILES = ("styles.css", "script.js", "favicon.svg")
 PLACEHOLDER = re.compile(r"\[\[[A-Z_]+\]\]")
 FIELDS = {
     "PUBLISHER_NAME": "publisherName",
@@ -37,7 +36,8 @@ FIELDS = {
     "APPLICABLE_PRIVACY_RIGHTS_AND_SUPERVISORY_AUTHORITY": "applicablePrivacyRightsAndSupervisoryAuthority",
 }
 OPTIONAL = {"publicLegalDetails"}
-DRAFT = '<p class="draft">Vorschau · Anbieter- und Kontaktangaben sind noch nicht vollständig. Diese Fassung ist nicht veröffentlicht.</p>'
+DRAFT = '<p class="draft">Entwurf · Diese Informationen werden noch vervollständigt. Offene Angaben sind gekennzeichnet.</p>'
+PREVIEW = '<p class="draft">Vorschau · Diese Ansicht dient zur Prüfung. Offene Angaben sind gekennzeichnet.</p>'
 FIELD_LABELS = {
     "publisherName": "Name des Anbieters",
     "copyrightHolder": "Name des Anbieters",
@@ -135,15 +135,17 @@ class Links(HTMLParser):
                 self.identifiers.add(value)
 
 
-def render_page(content, config, preview):
+def render_page(content, config, *, preview=False, draft=False, page_name="index.html"):
     for key in OPTIONAL:
         if not config.get(key):
             content = re.sub(r'<section\b[^>]*data-optional="' + re.escape(key) + r'"[^>]*>.*?</section>', "", content, flags=re.S)
-    if preview:
-        # A missing contact address must never become a clickable fake email.
-        if is_placeholder(config.get("supportEmail")):
-            content = re.sub(r'<a\b([^>]*?)href="mailto:\[\[PUBLIC_SUPPORT_EMAIL\]\]"([^>]*)>(.*?)</a>',
-                             r'<span\1 aria-disabled="true"\2>\3</span>', content, flags=re.S)
+    # A missing contact address must never become a clickable fake email,
+    # including on publicly accessible draft pages.
+    if is_placeholder(config.get("supportEmail")):
+        content = re.sub(r'<a\b([^>]*?)href="mailto:\[\[PUBLIC_SUPPORT_EMAIL\]\]"([^>]*)>(.*?)</a>',
+                         r'<span\1 aria-disabled="true"\2>\3</span>', content, flags=re.S)
+    if is_placeholder(config.get("copyrightHolder")):
+        content = re.sub(r'<p>©\s+\d{4}\s+<span class="placeholder">\[\[COPYRIGHT_HOLDER\]\]</span></p>', "", content)
     for token, key in FIELDS.items():
         value = config.get(key)
         if key in OPTIONAL:
@@ -156,7 +158,10 @@ def render_page(content, config, preview):
         content = content.replace(f"[[{token}]]", html.escape(value, quote=True))
     content = re.sub(r'<p class="draft">.*?</p>', "", content, flags=re.S)
     if preview:
+        content = content.replace("<main", PREVIEW + "\n<main", 1)
+    elif draft and page_name != "index.html":
         content = content.replace("<main", DRAFT + "\n<main", 1)
+    if preview or draft:
         content = re.sub(r'<meta name="robots" content="[^"]*">', '<meta name="robots" content="noindex,nofollow">', content)
         if '<meta name="robots"' not in content:
             content = content.replace("</head>", '<meta name="robots" content="noindex,nofollow"></head>')
@@ -206,32 +211,6 @@ def copy_public_file(source, destination):
     shutil.copyfile(source, destination)
 
 
-def cards_html(apps, preview):
-    cards = []
-    for _, manifest in apps:
-        name = html.escape(manifest["name"])
-        description = html.escape(manifest["description"])
-        status = "Vorschau" if preview else ("Veröffentlicht" if manifest["status"] == "published" else "In Vorbereitung")
-        cards.append(f'<a class="app-card" href="{manifest["slug"]}/"><span class="app-status">{status}</span>'
-                     f'<h2>{name}</h2><p>{description}</p><span class="app-link">Website ansehen →</span></a>')
-    return "\n".join(cards)
-
-
-def holding_page(manifest):
-    name = html.escape(manifest["name"])
-    description = html.escape(manifest["description"])
-    return f'''<!doctype html>
-<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="robots" content="noindex,follow"><meta name="theme-color" content="#153e32">
-<title>{name} · Website in Vorbereitung</title><link rel="icon" href="favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="styles.css"></head><body><div class="shell">
-<header class="site-header"><a class="wordmark" href="../">Schobebro<span>.</span></a></header>
-<main id="inhalt"><section class="document-heading"><p class="eyebrow">Website in Vorbereitung</p>
-<h1>{name}</h1><p class="lede">{description}</p><p>Die öffentlichen Informationen zu dieser App werden noch vorbereitet.</p>
-<a class="back-link" href="../">← Alle Apps</a></section></main></div></body></html>
-'''
-
-
 def validate_tree(directory, preview=False):
     """Catch unresolved tokens and broken local links across all deployed pages."""
     pages = {}
@@ -275,25 +254,16 @@ def build(root=ROOT, preview=False):
     if output.is_symlink() or output.parent.is_symlink():
         raise ValueError("Ausgabeziel darf kein symbolischer Link sein")
     output.parent.mkdir(parents=True, exist_ok=True)
-    urls = [BASE_URL]
+    urls = []
     with tempfile.TemporaryDirectory(prefix="site-", dir=output.parent) as temp:
         staging = Path(temp) / "site"
         staging.mkdir()
-        portal = root / "portal"
-        portal_index = portal / "index.html"
-        if portal_index.is_symlink():
-            raise ValueError("Portal darf kein symbolischer Link sein")
-        content = portal_index.read_text(encoding="utf-8")
-        if content.count("[[APP_CARDS]]") != 1:
-            raise ValueError("portal/index.html muss genau ein [[APP_CARDS]] enthalten")
-        content = content.replace("[[APP_CARDS]]", cards_html(apps, preview))
+        copy_public_file(root / "root/index.html", staging / "index.html")
         if preview:
+            content = (staging / "index.html").read_text(encoding="utf-8")
             content = re.sub(r'<meta name="robots" content="[^"]*">', "", content)
             content = content.replace("</head>", '<meta name="robots" content="noindex,nofollow"></head>')
-        (staging / "index.html").write_text(content, encoding="utf-8")
-        for name in PORTAL_FILES:
-            if (portal / name).exists():
-                copy_public_file(portal / name, staging / name)
+            (staging / "index.html").write_text(content, encoding="utf-8")
         for directory, manifest in apps:
             slug = manifest["slug"]
             destination = staging / slug
@@ -301,13 +271,9 @@ def build(root=ROOT, preview=False):
             source = directory / "site"
             if source.is_symlink():
                 raise ValueError(f"{slug}: Website darf kein symbolischer Link sein")
-            if not preview and manifest["status"] == "draft":
-                (destination / "index.html").write_text(holding_page(manifest), encoding="utf-8")
-                for name in ("styles.css", "favicon.svg"):
-                    copy_public_file(source / name, destination / name)
-                continue
+            draft = manifest["status"] == "draft"
             config = effective_config(read_json(directory / "config.json"))
-            if not preview:
+            if not preview and not draft:
                 validate_config(config)
             for name in APP_FILES:
                 copy_public_file(source / name, destination / name)
@@ -315,18 +281,21 @@ def build(root=ROOT, preview=False):
                 page = source / name
                 if page.is_symlink():
                     raise ValueError(f"{slug}/{name}: symbolische Links sind nicht erlaubt")
-                content = render_page(page.read_text(encoding="utf-8"), config, preview)
+                content = render_page(page.read_text(encoding="utf-8"), config, preview=preview, draft=draft, page_name=name)
                 if not preview:
-                    if any(marker in content for marker in ('class="draft"', "noindex", 'class="placeholder"', "Noch offen:")):
+                    if not draft and any(marker in content for marker in ('class="draft"', "noindex", 'class="placeholder"', "Noch offen:")):
                         raise ValueError(f"{slug}/{name}: Entwurf oder Platzhalter darf nicht veröffentlicht werden")
                     canonical = urljoin(BASE_URL, slug + "/" + ("" if name == "index.html" else name))
                     content = content.replace("</head>", f'<link rel="canonical" href="{html.escape(canonical, quote=True)}"></head>')
-                    urls.append(canonical)
+                    if not draft:
+                        urls.append(canonical)
                 (destination / name).write_text(content, encoding="utf-8")
         (staging / ".nojekyll").touch()
-        robots = "User-agent: *\nDisallow: /\n" if preview else f"User-agent: *\nAllow: /\nSitemap: {BASE_URL}sitemap.xml\n"
+        robots = "User-agent: *\nDisallow: /\n" if preview else "User-agent: *\nAllow: /\n"
+        if not preview and urls:
+            robots += f"Sitemap: {BASE_URL}sitemap.xml\n"
         (staging / "robots.txt").write_text(robots, encoding="utf-8")
-        if not preview:
+        if not preview and urls:
             entries = "".join(f"<url><loc>{html.escape(url)}</loc></url>" for url in urls)
             (staging / "sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + entries + "</urlset>\n", encoding="utf-8")
         validate_tree(staging, preview)

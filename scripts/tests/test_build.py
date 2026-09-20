@@ -5,6 +5,7 @@ from pathlib import Path
 import shutil
 import tempfile
 import unittest
+from urllib.parse import urlparse
 
 SPEC = importlib.util.spec_from_file_location("site_build", Path(__file__).parents[1] / "build.py")
 builder = importlib.util.module_from_spec(SPEC)
@@ -18,9 +19,7 @@ class SiteBuildTests(unittest.TestCase):
         self.root = Path(self.temp.name)
         self.app = self.root / "apps/uebergabe"
         shutil.copytree(builder.ROOT / "apps/uebergabe", self.app)
-        portal = self.root / "portal"
-        portal.mkdir()
-        (portal / "index.html").write_text('<!doctype html><html lang="de"><head><title>Apps</title></head><body><main>[[APP_CARDS]]</main></body></html>')
+        shutil.copytree(builder.ROOT / "root", self.root / "root")
 
     def manifest(self, **changes):
         path = self.app / "app.json"
@@ -42,22 +41,53 @@ class SiteBuildTests(unittest.TestCase):
         (self.app / "config.json").write_text(json.dumps(config))
         return config
 
-    def test_draft_never_deploys_unfinished_legal_pages(self):
+    def test_draft_mounts_full_website_and_marks_unfinished_legal_pages(self):
         output = builder.build(self.root)
         files = {str(path.relative_to(output / "uebergabe")) for path in (output / "uebergabe").rglob("*") if path.is_file()}
-        self.assertEqual(files, {"index.html", "styles.css", "favicon.svg"})
+        self.assertEqual(files, set(builder.PAGES + builder.APP_FILES))
+        for name in builder.PAGES:
+            page = (output / "uebergabe" / name).read_text()
+            self.assertIn('content="noindex,nofollow"', page)
+            self.assertNotIn("nicht veröffentlicht", page)
+            self.assertNotIn("[[", page)
+            self.assertNotIn('href="mailto:', page)
+            canonical = "https://schobebro.github.io/uebergabe/" + ("" if name == "index.html" else name)
+            self.assertIn(f'rel="canonical" href="{canonical}"', page)
+            if name != "index.html":
+                self.assertIn('class="draft">Entwurf', page)
         landing = (output / "uebergabe/index.html").read_text()
-        self.assertIn("Website in Vorbereitung", landing)
-        self.assertNotIn("privacy.html", landing)
-        self.assertNotIn("privacy.html", (output / "sitemap.xml").read_text())
+        self.assertIn("Ausgeben.", landing)
+        self.assertIn('src="assets/app-comparison.png"', landing)
+        self.assertIn('href="privacy.html"', landing)
+        self.assertNotIn('class="draft"', landing)
+        self.assertNotIn("Noch offen:", landing)
+        self.assertNotIn("Website in Vorbereitung", landing)
+        self.assertFalse((output / "sitemap.xml").exists())
+        self.assertNotIn("Sitemap:", (output / "robots.txt").read_text())
+        self.assertIn("Noch offen: Name des Anbieters", (output / "uebergabe/imprint.html").read_text())
+
+    def test_root_is_only_redirect_without_shared_portal(self):
+        unused_portal = self.root / "portal"
+        unused_portal.mkdir()
+        (unused_portal / "index.html").write_text("OLD SHARED PORTAL [[APP_CARDS]]")
+        (self.root / "root/private.txt").write_text("NOT A PUBLIC FILE")
+        output = builder.build(self.root)
+        root_page = (output / "index.html").read_text()
+        self.assertEqual(root_page, (self.root / "root/index.html").read_text())
+        self.assertIn('http-equiv="refresh"', root_page)
+        self.assertIn('href="uebergabe/"', root_page)
+        self.assertNotIn("OLD SHARED PORTAL", root_page)
+        self.assertNotIn("app-card", root_page)
+        self.assertFalse((output / "styles.css").exists())
+        self.assertFalse((output / "private.txt").exists())
 
     def test_partial_published_config_is_rejected_without_replacing_output(self):
         output = builder.build(self.root)
-        previous = (output / "uebergabe/index.html").read_text()
+        previous = {path.relative_to(output): path.read_bytes() for path in output.rglob("*") if path.is_file()}
         self.manifest(status="published")
         with self.assertRaisesRegex(ValueError, "angaben fehlen"):
             builder.build(self.root)
-        self.assertEqual((output / "uebergabe/index.html").read_text(), previous)
+        self.assertEqual({path.relative_to(output): path.read_bytes() for path in output.rglob("*") if path.is_file()}, previous)
 
     def test_published_config_renders_five_escaped_pages(self):
         self.manifest(status="published")
@@ -68,11 +98,44 @@ class SiteBuildTests(unittest.TestCase):
             self.assertNotIn("[[", text)
             self.assertNotIn("Noch offen:", text)
             self.assertNotIn("noindex", text)
+            self.assertNotIn('class="draft"', text)
             canonical = "https://schobebro.github.io/uebergabe/" + ("" if name == "index.html" else name)
             self.assertIn(f'rel="canonical" href="{canonical}"', text)
         privacy = (output / "uebergabe/privacy.html").read_text()
         self.assertIn("Muster &amp; Partner &lt;Büro&gt; &quot;Nord&quot;", privacy)
         self.assertNotIn("<Büro>", privacy)
+        self.assertIn("© 2026", privacy)
+        self.assertEqual((output / "sitemap.xml").read_text().count("<url>"), 5)
+        self.assertNotIn("<loc>https://schobebro.github.io/</loc>", (output / "sitemap.xml").read_text())
+
+    def test_multiple_apps_keep_pages_assets_and_indexing_independent(self):
+        second = self.root / "apps/zweite-app"
+        shutil.copytree(self.app, second)
+        manifest = json.loads((second / "app.json").read_text())
+        (second / "app.json").write_text(json.dumps(manifest | {"slug": "zweite-app", "name": "Zweite App"}))
+        self.manifest(status="published")
+        self.valid_config()
+        output = builder.build(self.root)
+        for slug, indexed in (("uebergabe", True), ("zweite-app", False)):
+            for name in builder.PAGES:
+                page_path = output / slug / name
+                page = page_path.read_text()
+                canonical = f"{builder.BASE_URL}{slug}/" + ("" if name == "index.html" else name)
+                self.assertIn(f'rel="canonical" href="{canonical}"', page)
+                self.assertEqual("noindex,nofollow" in page, not indexed)
+                links = builder.Links()
+                links.feed(page)
+                for link in links.links:
+                    parsed = urlparse(link)
+                    if not parsed.scheme:
+                        target = (page_path.parent / parsed.path).resolve()
+                        self.assertTrue(target.is_relative_to(output / slug), link)
+            for name in builder.APP_FILES:
+                self.assertTrue((output / slug / name).is_file())
+        sitemap = (output / "sitemap.xml").read_text()
+        self.assertNotIn("zweite-app", sitemap)
+        self.assertEqual(sitemap.count("<url>"), 5)
+        self.assertIn("Sitemap: https://schobebro.github.io/sitemap.xml", (output / "robots.txt").read_text())
 
     def test_preview_includes_full_draft_with_disabled_missing_email(self):
         output = builder.build(self.root, preview=True)
@@ -80,6 +143,7 @@ class SiteBuildTests(unittest.TestCase):
             text = (output / "uebergabe" / name).read_text()
             self.assertIn("noindex,nofollow", text)
             self.assertIn('class="draft"', text)
+            self.assertNotIn("nicht veröffentlicht", text)
             self.assertNotIn('href="mailto:Noch offen', text)
         self.assertIn("noindex", (output / "index.html").read_text())
         self.assertEqual((output / "robots.txt").read_text(), "User-agent: *\nDisallow: /\n")
