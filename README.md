@@ -3,6 +3,7 @@
 Ein gemeinsames Repository für eigenständige App-Websites. Jede App hat ihre eigene Startseite, Gestaltung, Navigation, Hilfe und Rechtstexte unter einem eigenen URL-Pfad. Es gibt keine gemeinsame App-Übersicht. **Dieses Repository enthält ausschließlich Website-Dateien; App-Quellcode bleibt in den jeweiligen privaten Repositories.**
 
 - **Übergabe-Website:** https://schobebro.github.io/uebergabe/
+- **Doppelpfad-Website:** https://schobebro.github.io/doppelpfad/
 - `https://schobebro.github.io/` leitet direkt zu Übergabe weiter.
 - Weitere Websites werden unabhängig unter `/app-name/` ergänzt.
 
@@ -11,6 +12,7 @@ Ein gemeinsames Repository für eigenständige App-Websites. Jede App hat ihre e
 ```text
 root/index.html            Weiterleitung zu Übergabe, keine gemeinsame Website
 apps/
+  doppelpfad/              Eigenständige Website für das Offline-Rätselspiel
   uebergabe/
     app.json               Name, Beschreibung, URL-Pfad und Veröffentlichungsstatus
     config.json            Ausschließlich öffentliche Betreiberangaben
@@ -34,7 +36,7 @@ python3 scripts/build.py
 python3 -m http.server 4180 --bind 127.0.0.1 --directory build/site
 ```
 
-Unter http://127.0.0.1:4180/uebergabe/ siehst du die eigenständige Übergabe-Website. Für die ausdrücklich markierte lokale Vorschau:
+Unter http://127.0.0.1:4180/uebergabe/ und http://127.0.0.1:4180/doppelpfad/ siehst du die eigenständigen App-Websites. Für die ausdrücklich markierte lokale Vorschau:
 
 ```sh
 python3 scripts/build.py --preview
@@ -79,6 +81,30 @@ Die Seiten haben jeweils eigene direkte Adressen:
 - Impressum: https://schobebro.github.io/uebergabe/imprint.html
 
 Solange der Status `draft` ist, zeigen Kontakt- und Rechtsseiten einen Entwurfshinweis. Fehlende E-Mail-Adressen sind keine anklickbaren Kontaktlinks. Die Texte müssen vor der Verwendung im App-Store-Release fertiggestellt werden.
+
+## Aktueller Stand: Doppelpfad
+
+`apps/doppelpfad/app.json` steht auf `"status": "published"`. Die Website
+verwendet Doppelpfads Papierfarben, sein App-Icon und eine native Aufnahme aus
+Version 1.0.0 (13). Sie enthält eine Produktseite, Spielhilfe mit aufklappbaren
+Antworten, Support, Datenschutz, Nutzungsbedingungen und Impressum.
+
+Die öffentlichen Betreiber- und Supportangaben entsprechen dem bestehenden
+Company-Setup mit Leo und Felix. Die Datenschutztexte beschreiben Doppelpfads
+lokale Spielstände, Wiederherstellungskopien und mögliche Betriebssystem-Sicherungen.
+Eine App-Store-Verfügbarkeit oder ein Preis wird noch nicht angekündigt.
+`published` bezieht sich auf die Website. Eine spätere App-Store-Verlinkung
+wird nach Bestätigung der echten Store-Adresse ergänzt.
+
+- Produkt: https://schobebro.github.io/doppelpfad/
+- Support: https://schobebro.github.io/doppelpfad/support.html
+- Datenschutz: https://schobebro.github.io/doppelpfad/privacy.html
+- Nutzungsbedingungen: https://schobebro.github.io/doppelpfad/terms.html
+- Impressum: https://schobebro.github.io/doppelpfad/imprint.html
+
+[Gestaltung und Bildherkunft](apps/doppelpfad/BRAND.md) ·
+[Grundlage der öffentlichen Texte](apps/doppelpfad/LEGAL-NOTES.md) ·
+[Prüfnachweis](apps/doppelpfad/VERIFICATION.md)
 
 ## Weitere App hinzufügen
 
