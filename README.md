@@ -86,7 +86,7 @@ Solange der Status `draft` ist, zeigen Kontakt- und Rechtsseiten einen Entwurfsh
 
 `apps/doppelpfad/app.json` steht auf `"status": "published"`. Die Website
 verwendet Doppelpfads Papierfarben, sein App-Icon und eine native Aufnahme aus
-Version 1.0.0 (13). Sie enthält eine Produktseite, Spielhilfe mit aufklappbaren
+Version 1.0.0 (14). Sie enthält eine Produktseite, Spielhilfe mit aufklappbaren
 Antworten, Support, Datenschutz, Nutzungsbedingungen und Impressum.
 
 Die öffentlichen Betreiber- und Supportangaben entsprechen dem bestehenden

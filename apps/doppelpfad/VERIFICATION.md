@@ -32,3 +32,11 @@ Stand: 22. September 2026. Geprüft wurde die eigenständige Website unter
 Die Website kündigt die App-Store-Veröffentlichung als vorbereitet an und zeigt
 noch keinen Download-Button. Die Prüfung der Website ist keine neue Prüfung
 des nativen App-Builds oder der rechtlichen Eignung der Betreiberregelung.
+
+## Aktualisierung der Spielaufnahme
+
+Die Website verwendet jetzt die native Aufnahme aus Build 14 mit neutralem
+Papierweiß in der unteren Welle. Nur die Bilddatei und ihre Cache-Version
+wurden auf der Produktseite geändert. Die neue Aufnahme behält 1320 × 2868 Pixel;
+Herkunft und Prüfsumme stehen in [BRAND.md](BRAND.md). Die oben genannten
+Browserprüfungen beschreiben das unveränderte Website-Layout.
