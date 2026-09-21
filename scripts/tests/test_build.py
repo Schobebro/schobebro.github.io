@@ -184,7 +184,7 @@ class SiteBuildTests(unittest.TestCase):
         self.assertEqual(contents, allowed)
 
     def test_source_symlink_is_rejected(self):
-        target = self.app / "site/favicon.svg"
+        target = self.app / "site/favicon.png"
         target.unlink()
         target.symlink_to(self.app / "config.json")
         with self.assertRaisesRegex(ValueError, "Link"):

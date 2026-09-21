@@ -47,6 +47,8 @@ Die lokale Vorschau unter http://127.0.0.1:4181/uebergabe/ markiert alle Seiten 
 
 `apps/uebergabe/app.json` steht auf `"status": "published"`. Die vollständige Website mit Start, Support, Datenschutz, Nutzungsbedingungen und Impressum enthält die angegebenen Betreiberanschriften und beide Kontaktadressen. Gemeinsame Verantwortung, Gmail, GitHub Pages, lokale Speicherung und Apple-Systemdienste sind beschrieben. [Grundlage und Betriebshinweise](apps/uebergabe/LEGAL-NOTES.md). Links und Assets bleiben innerhalb von `/uebergabe/`.
 
+Das freigegebene Logo zeigt zwei Menschen bei einer Übergabe, deren Körper ein gemeinsamer U-Bogen verbindet. Die Bildmarke steht neben dem Namen im Kopf aller fünf Seiten und wird für Favicon und Apple-Touch-Icon verwendet. [Herkunft und übernommene Dateien](apps/uebergabe/BRAND.md).
+
 Die öffentlichen Betreiber- und Datenschutzangaben werden in `apps/uebergabe/config.json` gepflegt:
 
 | Feld | Öffentlich angezeigter Inhalt |

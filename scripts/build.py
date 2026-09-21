@@ -20,7 +20,7 @@ from urllib.parse import unquote, urljoin, urlparse
 ROOT = Path(__file__).resolve().parents[1]
 BASE_URL = "https://schobebro.github.io/"
 PAGES = ("index.html", "support.html", "privacy.html", "terms.html", "imprint.html")
-APP_FILES = ("styles.css", "script.js", "favicon.svg", ".nojekyll", "assets/app-comparison.png")
+APP_FILES = ("styles.css", "script.js", "favicon.png", "apple-touch-icon.png", ".nojekyll", "assets/app-comparison.png", "assets/logo-256.png")
 PLACEHOLDER = re.compile(r"\[\[[A-Z_]+\]\]")
 FIELDS = {
     "PUBLISHER_NAME": "publisherName",
