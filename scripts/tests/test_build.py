@@ -197,6 +197,82 @@ class SiteBuildTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     builder.validate_config(config | change)
 
+class AppFileListAndLanguageTests(unittest.TestCase):
+    """Per-app file lists (app.json "files") and English notices for lang="en" pages."""
+
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name)
+        self.app = self.root / "apps/claret"
+        shutil.copytree(builder.ROOT / "apps/claret", self.app)
+        # The root redirect points at Übergabe, so its site must be present.
+        shutil.copytree(builder.ROOT / "apps/uebergabe", self.root / "apps/uebergabe")
+        shutil.copytree(builder.ROOT / "root", self.root / "root")
+
+    def manifest(self, **changes):
+        path = self.app / "app.json"
+        value = json.loads(path.read_text())
+        value.update(changes)
+        path.write_text(json.dumps(value))
+        return value
+
+    def test_app_file_list_replaces_default_allowlist(self):
+        files = json.loads((self.app / "app.json").read_text())["files"]
+        (self.app / "site/script.js").write_text("not listed")
+        (self.app / "site/notes.txt").write_text("not listed")
+        output = builder.build(self.root)
+        copied = {str(path.relative_to(output / "claret")) for path in (output / "claret").rglob("*") if path.is_file()}
+        self.assertEqual(copied, set(builder.PAGES) | set(files))
+        self.assertNotIn("script.js", copied)
+
+    def test_unsafe_or_private_file_entries_are_rejected(self):
+        for entry in ("../outside.png", "/abs.png", "img/../x.png", "config.json", "site/.env", "index.html", "a//b.png", ""):
+            with self.subTest(entry=entry):
+                self.manifest(files=[".nojekyll", entry])
+                with self.assertRaisesRegex(ValueError, "files"):
+                    builder.build(self.root)
+        self.manifest(files=["style.css", "style.css"])
+        with self.assertRaisesRegex(ValueError, "doppelte"):
+            builder.build(self.root)
+        self.manifest(files=[])
+        with self.assertRaisesRegex(ValueError, "files"):
+            builder.build(self.root)
+
+    def test_listed_file_must_exist(self):
+        self.manifest(files=[".nojekyll", "img/missing.webp"])
+        with self.assertRaisesRegex(ValueError, "fehlt"):
+            builder.build(self.root)
+
+    def test_english_pages_get_english_draft_notice_and_date(self):
+        self.manifest(status="draft")
+        output = builder.build(self.root)
+        privacy = (output / "claret/privacy.html").read_text()
+        self.assertIn('class="draft">Draft', privacy)
+        self.assertNotIn("Entwurf", privacy)
+        self.assertIn("noindex,nofollow", privacy)
+        config = json.loads((self.app / "config.json").read_text())
+        day = builder.date.fromisoformat(config["lastUpdated"])
+        self.assertIn(f"Last updated {day.day} ", privacy)
+        self.assertNotIn(day.strftime("%d.%m.%Y"), privacy)
+        self.assertNotIn('class="draft"', (output / "claret/index.html").read_text())
+        preview = builder.build(self.root, preview=True)
+        self.assertIn('class="draft">Preview', (preview / "claret/index.html").read_text())
+
+    def test_english_missing_values_are_marked_in_english(self):
+        shutil.copyfile(self.app / "config.example.json", self.app / "config.json")
+        output = builder.build(self.root)
+        imprint = (output / "claret/imprint.html").read_text()
+        self.assertIn("Not yet provided: postal address", imprint)
+        self.assertNotIn("Noch offen", imprint)
+        self.assertNotIn('href="mailto:[[', imprint)
+        self.manifest(status="published")
+        with self.assertRaisesRegex(ValueError, "angaben fehlen"):
+            builder.build(self.root)
+
+    def test_claret_config_validates_for_publication(self):
+        builder.validate_config(json.loads((self.app / "config.json").read_text()))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -4,6 +4,7 @@ Ein gemeinsames Repository für eigenständige App-Websites. Jede App hat ihre e
 
 - **Übergabe-Website:** https://schobebro.github.io/uebergabe/
 - **Doppelpfad-Website:** https://schobebro.github.io/doppelpfad/
+- **Claret-Website (Entwurf):** https://schobebro.github.io/claret/
 - `https://schobebro.github.io/` leitet direkt zu Übergabe weiter.
 - Weitere Websites werden unabhängig unter `/app-name/` ergänzt.
 
@@ -12,9 +13,10 @@ Ein gemeinsames Repository für eigenständige App-Websites. Jede App hat ihre e
 ```text
 root/index.html            Weiterleitung zu Übergabe, keine gemeinsame Website
 apps/
+  claret/                  Eigenständige englische Website der Lern-App (Entwurf)
   doppelpfad/              Eigenständige Website für das Offline-Rätselspiel
   uebergabe/
-    app.json               Name, Beschreibung, URL-Pfad und Veröffentlichungsstatus
+    app.json               Name, Beschreibung, URL-Pfad, Status, optional Dateiliste `files`
     config.json            Ausschließlich öffentliche Betreiberangaben
     config.example.json    Vorlage der erforderlichen Angaben
     site/                  HTML, CSS, JS und öffentlich freigegebene Bilder
@@ -106,13 +108,32 @@ wird nach Bestätigung der echten Store-Adresse ergänzt.
 [Grundlage der öffentlichen Texte](apps/doppelpfad/LEGAL-NOTES.md) ·
 [Prüfnachweis](apps/doppelpfad/VERIFICATION.md)
 
+## Aktueller Stand: Claret
+
+`apps/claret/app.json` steht auf `"status": "draft"`: alle Seiten tragen `noindex`,
+Unterseiten einen englischen Entwurfshinweis. Claret ist eine unabhängige
+Lern-App für die Level-2-Weinprüfung; Seitentexte sind Englisch. Die Seiten
+entstehen im privaten App-Repository (`marketing/templates/`) und werden mit
+`marketing/sync-website` hierher kopiert; Betreiberangaben kommen nur aus
+`apps/claret/config.json`. Die öffentlichen Nicht-HTML-Dateien stehen in
+`app.json` unter `files`.
+
+- Produkt: https://schobebro.github.io/claret/
+- Support: https://schobebro.github.io/claret/support.html
+- Datenschutz: https://schobebro.github.io/claret/privacy.html
+- Nutzungsbedingungen: https://schobebro.github.io/claret/terms.html
+- Impressum: https://schobebro.github.io/claret/imprint.html
+
+[Gestaltung, Bildherkunft und Abgleich](apps/claret/BRAND.md) ·
+[Grundlage der öffentlichen Texte](apps/claret/LEGAL-NOTES.md)
+
 ## Weitere App hinzufügen
 
 1. `apps/uebergabe/` als Ausgangspunkt nach `apps/meine-app/` kopieren.
 2. In `app.json` `slug` auf `meine-app` setzen und Name/Beschreibung anpassen. `status` zunächst `draft` lassen. Der Slug muss dem Ordnernamen entsprechen; nur Kleinbuchstaben, Ziffern und Bindestriche sind erlaubt.
 3. In `config.json` die öffentlichen Angaben passend zur App ergänzen. Die URLs leitet der Builder automatisch aus dem Slug ab.
 4. Alle fünf HTML-Seiten, Bilder, Favicon und Rechtstexte tatsächlich auf die neue App anpassen. Insbesondere sind Angaben zu Datenspeicherung, Berechtigungen und Drittanbietern app-spezifisch.
-5. Beide Builds prüfen und die Vorschau auf Desktop und Mobilgerät ansehen. Für zusätzliche Assets die explizite Dateiliste `APP_FILES` in `scripts/build.py` erweitern.
+5. Beide Builds prüfen und die Vorschau auf Desktop und Mobilgerät ansehen. Ohne Angabe gilt die Standardliste `APP_FILES` in `scripts/build.py`; eigene Assets nennt die App in `app.json` als Liste `files` (sichere relative Pfade, keine versteckten, `.json`- oder `.md`-Dateien). Seiten mit `<html lang="en…">` erhalten englische Entwurfs- und Vorschauhinweise und ein englisches Datum.
 6. Auf `main` committen: die vollständige eigenständige Website liegt unter `/meine-app/`. Sobald alle Angaben und Texte fertig sind, `status` auf `published` setzen; die Entwurfshinweise entfallen nach erfolgreicher Validierung.
 
 Es werden keine App-Kacheln, gemeinsame Navigation oder Querverlinkungen erzeugt. Alle relativen Links innerhalb einer App funktionieren unter ihrem Unterverzeichnis. Die Root-Weiterleitung bleibt ausdrücklich auf Übergabe gerichtet und ändert sich nicht automatisch, wenn eine weitere App hinzukommt.

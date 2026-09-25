@@ -20,7 +20,9 @@ from urllib.parse import unquote, urljoin, urlparse
 ROOT = Path(__file__).resolve().parents[1]
 BASE_URL = "https://schobebro.github.io/"
 PAGES = ("index.html", "support.html", "privacy.html", "terms.html", "imprint.html")
+# Default public file list; an app may name its own list as "files" in app.json.
 APP_FILES = ("styles.css", "script.js", "favicon.png", "apple-touch-icon.png", ".nojekyll", "assets/app-comparison.png", "assets/logo-256.png")
+SAFE_FILE = re.compile(r"(?:[A-Za-z0-9_-][A-Za-z0-9._-]*/)*[A-Za-z0-9._-]+")
 PLACEHOLDER = re.compile(r"\[\[[A-Z_]+\]\]")
 FIELDS = {
     "PUBLISHER_NAME": "publisherName",
@@ -39,6 +41,10 @@ FIELDS = {
 OPTIONAL = {"publicLegalDetails", "secondarySupportEmail"}
 DRAFT = '<p class="draft">Entwurf · Diese Informationen werden noch vervollständigt. Offene Angaben sind gekennzeichnet.</p>'
 PREVIEW = '<p class="draft">Vorschau · Diese Ansicht dient zur Prüfung. Offene Angaben sind gekennzeichnet.</p>'
+# Pages declaring <html lang="en..."> get English notices; all other pages keep the German ones.
+DRAFT_EN = '<p class="draft">Draft · This information is still being completed. Open details are marked.</p>'
+PREVIEW_EN = '<p class="draft">Preview · This view is for review only. Open details are marked.</p>'
+MISSING = {"de": "Noch offen: ", "en": "Not yet provided: "}
 FIELD_LABELS = {
     "publisherName": "Name des Anbieters",
     "copyrightHolder": "Name des Anbieters",
@@ -50,6 +56,21 @@ FIELD_LABELS = {
     "websitePrivacyBasis": "Zweck und Rechtsgrundlage der Website",
     "applicablePrivacyRightsAndSupervisoryAuthority": "Datenschutzrechte und Aufsichtsbehörde",
 }
+FIELD_LABELS_EN = {
+    "publisherName": "provider name",
+    "copyrightHolder": "provider name",
+    "publisherPostalAddress": "postal address",
+    "supportEmail": "contact e-mail",
+    "supportMailProvider": "e-mail service",
+    "supportRetentionPolicy": "retention and deletion",
+    "supportPrivacyDetails": "privacy information for support",
+    "websitePrivacyBasis": "purpose and legal basis of the website",
+    "applicablePrivacyRightsAndSupervisoryAuthority": "privacy rights and supervisory authority",
+}
+
+
+def page_language(content):
+    return "en" if re.search(r'<html\b[^>]*\blang="en(?:-[A-Za-z]+)?"', content) else "de"
 
 
 def effective_config(config):
@@ -140,6 +161,7 @@ class Links(HTMLParser):
 
 
 def render_page(content, config, *, preview=False, draft=False, page_name="index.html"):
+    language = page_language(content)
     for key in OPTIONAL:
         if not config.get(key):
             content = re.sub(r'<section\b[^>]*data-optional="' + re.escape(key) + r'"[^>]*>.*?</section>', "", content, flags=re.S)
@@ -155,16 +177,21 @@ def render_page(content, config, *, preview=False, draft=False, page_name="index
         if key in OPTIONAL:
             value = value or ""
         elif is_placeholder(value):
-            value = "Noch offen: " + FIELD_LABELS.get(key, key)
+            labels = FIELD_LABELS_EN if language == "en" else FIELD_LABELS
+            value = MISSING[language] + labels.get(key, key)
         elif key == "lastUpdated":
             parsed_date = date.fromisoformat(value)
-            value = parsed_date.strftime("%d.%m.%Y")
+            if language == "en":
+                months = ("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
+                value = f"{parsed_date.day} {months[parsed_date.month - 1]} {parsed_date.year}"
+            else:
+                value = parsed_date.strftime("%d.%m.%Y")
         content = content.replace(f"[[{token}]]", html.escape(value, quote=True))
     content = re.sub(r'<p class="draft">.*?</p>', "", content, flags=re.S)
     if preview:
-        content = content.replace("<main", PREVIEW + "\n<main", 1)
+        content = content.replace("<main", (PREVIEW_EN if language == "en" else PREVIEW) + "\n<main", 1)
     elif draft and page_name != "index.html":
-        content = content.replace("<main", DRAFT + "\n<main", 1)
+        content = content.replace("<main", (DRAFT_EN if language == "en" else DRAFT) + "\n<main", 1)
     if preview or draft:
         content = re.sub(r'<meta name="robots" content="[^"]*">', '<meta name="robots" content="noindex,nofollow">', content)
         if '<meta name="robots"' not in content:
@@ -192,8 +219,8 @@ def load_apps(root):
         if directory.is_symlink() or not directory.is_dir():
             raise ValueError(f"App muss ein echtes Verzeichnis sein: {directory.name}")
         manifest = read_json(directory / "app.json")
-        if not isinstance(manifest, dict) or set(manifest) != {"slug", "name", "description", "status"}:
-            raise ValueError(f"{directory.name}: Manifest benötigt slug, name, description und status")
+        if not isinstance(manifest, dict) or not {"slug", "name", "description", "status"} <= set(manifest) <= {"slug", "name", "description", "status", "files"}:
+            raise ValueError(f"{directory.name}: Manifest benötigt slug, name, description und status; optional files")
         slug = manifest["slug"]
         if not isinstance(slug, str) or not re.fullmatch(r"[a-z][a-z0-9]*(?:-[a-z0-9]+)*", slug) or slug != directory.name:
             raise ValueError(f"{directory.name}: slug muss ein sicherer Pfad sein und dem Ordnernamen entsprechen")
@@ -204,8 +231,23 @@ def load_apps(root):
         for field in ("name", "description"):
             if not isinstance(manifest[field], str) or not manifest[field].strip():
                 raise ValueError(f"{slug}: {field} muss Text enthalten")
+        manifest = dict(manifest, files=app_files(slug, manifest.get("files", APP_FILES)))
         apps.append((directory, manifest))
     return apps
+
+
+def app_files(slug, files):
+    """Validate an app's explicit list of public non-page files."""
+    if not isinstance(files, (list, tuple)) or not files:
+        raise ValueError(f"{slug}: files muss eine nicht leere Liste sein")
+    for name in files:
+        if not isinstance(name, str) or not SAFE_FILE.fullmatch(name) or any(part in {".", ".."} for part in name.split("/")):
+            raise ValueError(f"{slug}: unsicherer Dateipfad in files: {name!r}")
+        if name in PAGES or name.endswith((".json", ".md")) or (name.rsplit("/", 1)[-1].startswith(".") and name != ".nojekyll"):
+            raise ValueError(f"{slug}: {name} gehört nicht in files")
+    if len(set(files)) != len(files):
+        raise ValueError(f"{slug}: doppelte Einträge in files")
+    return tuple(files)
 
 
 def copy_public_file(source, destination):
@@ -279,7 +321,7 @@ def build(root=ROOT, preview=False):
             config = effective_config(read_json(directory / "config.json"))
             if not preview and not draft:
                 validate_config(config)
-            for name in APP_FILES:
+            for name in manifest["files"]:
                 copy_public_file(source / name, destination / name)
             for name in PAGES:
                 page = source / name
@@ -287,7 +329,7 @@ def build(root=ROOT, preview=False):
                     raise ValueError(f"{slug}/{name}: symbolische Links sind nicht erlaubt")
                 content = render_page(page.read_text(encoding="utf-8"), config, preview=preview, draft=draft, page_name=name)
                 if not preview:
-                    if not draft and any(marker in content for marker in ('class="draft"', "noindex", 'class="placeholder"', "Noch offen:")):
+                    if not draft and any(marker in content for marker in ('class="draft"', "noindex", 'class="placeholder"', "Noch offen:", "Not yet provided:")):
                         raise ValueError(f"{slug}/{name}: Entwurf oder Platzhalter darf nicht veröffentlicht werden")
                     canonical = urljoin(BASE_URL, slug + "/" + ("" if name == "index.html" else name))
                     content = content.replace("</head>", f'<link rel="canonical" href="{html.escape(canonical, quote=True)}"></head>')
