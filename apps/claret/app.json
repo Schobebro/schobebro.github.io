@@ -2,7 +2,7 @@
   "slug": "claret",
   "name": "Claret",
   "description": "An independent offline iPhone and iPad study course for the Level 2 wine exam: lessons, practice questions, a tasting trainer and timed mock exams.",
-  "status": "draft",
+  "status": "published",
   "files": [
     ".nojekyll",
     "style.css",

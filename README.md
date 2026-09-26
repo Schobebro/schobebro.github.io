@@ -4,7 +4,7 @@ Ein gemeinsames Repository für eigenständige App-Websites. Jede App hat ihre e
 
 - **Übergabe-Website:** https://schobebro.github.io/uebergabe/
 - **Doppelpfad-Website:** https://schobebro.github.io/doppelpfad/
-- **Claret-Website (Entwurf):** https://schobebro.github.io/claret/
+- **Claret-Website:** https://schobebro.github.io/claret/
 - `https://schobebro.github.io/` leitet direkt zu Übergabe weiter.
 - Weitere Websites werden unabhängig unter `/app-name/` ergänzt.
 
@@ -13,7 +13,7 @@ Ein gemeinsames Repository für eigenständige App-Websites. Jede App hat ihre e
 ```text
 root/index.html            Weiterleitung zu Übergabe, keine gemeinsame Website
 apps/
-  claret/                  Eigenständige englische Website der Lern-App (Entwurf)
+  claret/                  Eigenständige englische Website der Lern-App
   doppelpfad/              Eigenständige Website für das Offline-Rätselspiel
   uebergabe/
     app.json               Name, Beschreibung, URL-Pfad, Status, optional Dateiliste `files`
@@ -110,8 +110,8 @@ wird nach Bestätigung der echten Store-Adresse ergänzt.
 
 ## Aktueller Stand: Claret
 
-`apps/claret/app.json` steht auf `"status": "draft"`: alle Seiten tragen `noindex`,
-Unterseiten einen englischen Entwurfshinweis. Claret ist eine unabhängige
+`apps/claret/app.json` steht seit dem 26. September 2026 auf `"status": "published"`
+(Board-Freigabe über Uwe): keine Entwurfshinweise, Seiten indexierbar. Claret ist eine unabhängige
 Lern-App für die Level-2-Weinprüfung; Seitentexte sind Englisch. Die Seiten
 entstehen im privaten App-Repository (`marketing/templates/`) und werden mit
 `marketing/sync-website` hierher kopiert; Betreiberangaben kommen nur aus

@@ -260,6 +260,9 @@ class AppFileListAndLanguageTests(unittest.TestCase):
         self.assertIn('class="draft">Preview', (preview / "claret/index.html").read_text())
 
     def test_english_missing_values_are_marked_in_english(self):
+        # Missing values are only rendered while the app is a draft; Claret is
+        # published since 26 September 2026, so the test sets draft itself.
+        self.manifest(status="draft")
         shutil.copyfile(self.app / "config.example.json", self.app / "config.json")
         output = builder.build(self.root)
         imprint = (output / "claret/imprint.html").read_text()
