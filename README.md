@@ -5,6 +5,7 @@ Ein gemeinsames Repository für eigenständige App-Websites. Jede App hat ihre e
 - **Übergabe-Website:** https://schobebro.github.io/uebergabe/
 - **Doppelpfad-Website:** https://schobebro.github.io/doppelpfad/
 - **Claret-Website:** https://schobebro.github.io/claret/
+- **Health-Export-Website:** https://schobebro.github.io/health-export/ (Veröffentlichung vorbereitet)
 - `https://schobebro.github.io/` leitet direkt zu Übergabe weiter.
 - Weitere Websites werden unabhängig unter `/app-name/` ergänzt.
 
@@ -126,6 +127,25 @@ entstehen im privaten App-Repository (`marketing/templates/`) und werden mit
 
 [Gestaltung, Bildherkunft und Abgleich](apps/claret/BRAND.md) ·
 [Grundlage der öffentlichen Texte](apps/claret/LEGAL-NOTES.md)
+
+## Aktueller Stand: Health Export
+
+Fünf fertige deutsche Informationsseiten unter `/health-export/`;
+`status: published` bereitet die Veröffentlichung nach Freigabe vor.
+Die App ist noch nicht im App Store verfügbar. Geplant sind 0,99 € einmalig
+in Deutschland; es gibt keinen Download-Button oder behaupteten Store-Preis.
+Website-/Support-Betreiberangaben entsprechen dem bestehenden öffentlichen
+Company-Setup. Verkäuferangaben der späteren App werden separat bestätigt.
+
+Die Datenschutzseite beschreibt lesenden HealthKit-Zugriff, lokale Verarbeitung,
+unverschlüsselte Tages-JSON/CSV, gewählte Dateianbieter, Synchronisierung,
+Backups und Löschung. Apple-Abstimmung und Store-Voraussetzungen gehören
+in die [Betriebsnotizen](apps/health-export/LEGAL-NOTES.md).
+[Fertig geprüftes Veröffentlichungspaket und Live-Abnahme](apps/health-export/PUBLISHING.md)
+· [Prüfnachweise](apps/health-export/VERIFICATION.md).
+Ein Merge dieses Standes nach `main` veröffentlicht über den vorhandenen
+Pages-Workflow. Bis zu Freigabe, Deploy und Live-Abnahme sind die Zieladressen
+nur vorbereitet; lokale Builds belegen keine Veröffentlichung.
 
 ## Weitere App hinzufügen
 
