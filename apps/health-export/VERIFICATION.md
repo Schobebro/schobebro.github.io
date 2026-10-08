@@ -50,7 +50,43 @@ Lokale Build-/Link-/HTTP-Prüfung ist erfolgt; keine visuelle Abnahme auf echtem
 ## Ergänzende Hauptsession-Prüfung
 
 08.10.2026: 17 Tests und regulären/Vorschau-Build selbst erneut erfolgreich ausgeführt.
-Lokale Vorschau in Brave sichtbar kontrolliert: Startseite in Desktopbreite und390×844,
-Datenschutzseite in390×844. Navigation/Text/Icon passen in die Breite, keine abgeschnittenen
+Lokale Vorschau in Brave sichtbar kontrolliert: Startseite in Desktopbreite und 390×844,
+Datenschutzseite in 390×844. Navigation/Text/Icon passen in die Breite, keine abgeschnittenen
 Controls beobachtet; Entwurf-/Vorschauhinweise sichtbar. Das ist Browser-Emulation,
 keine reale iPhone-Browser-Abnahme und keine Veröffentlichungsfreigabe.
+
+
+## Erneute Paketabnahme · 08.10.2026
+
+Geprüfter Seitenstand: `e4688153bb41cc3e74d3ddfbab98aeaf1a033d8d`.
+17 Tests erneut bestanden (`Ran 17 tests in 0.351s`, `OK`), regulärer und
+Vorschau-Build erfolgreich. Beide enthalten genau die acht oben aufgeführten
+Dateien; keine unaufgelösten Platzhalter, auf allen fünf Seiten `lang="de"`,
+je ein H1 und `noindex`. Betreiberkonfiguration nochmals mit der bestehenden
+öffentlichen Übergabe-Konfiguration verglichen: ausschließlich das Standdatum
+weicht ab. Die GitHub-Prüfung des Seitenstands ist erfolgreich:
+[Workflow 37779509840](https://github.com/Schobebro/schobebro.github.io/actions/runs/37779509840).
+
+Quellabgleich: Zeitraum 1–365 Tage, Kurzbefehle 1–7 Tage/Standard 2,
+HealthKit nur lesend, zehn Datentypen, temporäres Staging mit vollständigem
+Dateischutz, Ordner-Bookmark/Exportstatus, Tages-JSON/CSV und Dateierhalt sind
+mit dem aktuellen Produktverhalten vereinbar. Keine behauptete medizinische
+Bewertung oder automatische Cloud-Zulassung.
+
+Eigener lokaler HTTP-Server, nach Prüfung beendet: Start, Datenschutz und
+Support lieferten HTTP 200. Browser-Abnahme in Brave bei 320 × 844 CSS-Pixeln:
+`innerWidth = scrollWidth = 320` auf allen drei Seiten, keine horizontalen
+Überläufe. Start und Datenschutz sichtbar kontrolliert. Tastaturfokus auf dem
+Markenlink zeigte `rgb(160, 71, 14) solid 3px`; die erste Support-Antwort ließ
+sich per Enter öffnen und war im DOM sichtbar. Semantische Überschriften,
+Navigation, Skip-Link und Bildalternativen vorhanden. Das ist keine reale
+VoiceOver-/iPhone-Abnahme und kein umfassendes WCAG-Konformitätszertifikat.
+
+Berechnete Kontraste der Textfarben zum jeweiligen CSS-Hintergrund:
+Fließtext 11,02:1, Links 6,30:1, Untertitel 5,73:1, Datum 5,12:1,
+Rubrik 5,76:1, Footer 5,56:1, Hinweis 8,35:1, Button 10,91:1.
+Fokuskontur zum Seitenhintergrund 5,72:1.
+
+Die geplante öffentliche Datenschutzadresse lieferte bei der erneuten
+lesenden Prüfung HTTP 404. Eine lokale HTTP-200-Antwort belegt keine
+Veröffentlichung. [Konkrete Freigabe und Live-Abnahme](PUBLISHING.md).
