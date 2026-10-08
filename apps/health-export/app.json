@@ -1,0 +1,11 @@
+{
+  "slug": "health-export",
+  "name": "Health Export",
+  "description": "Ausgewählte Apple-Health-Tageswerte als JSON und optional CSV. Auf deinem iPhone, ohne eigenen Server.",
+  "status": "draft",
+  "files": [
+    "styles.css",
+    "assets/app-icon.png",
+    ".nojekyll"
+  ]
+}
