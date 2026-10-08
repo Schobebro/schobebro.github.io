@@ -90,3 +90,22 @@ Fokuskontur zum Seitenhintergrund 5,72:1.
 Die geplante öffentliche Datenschutzadresse lieferte bei der erneuten
 lesenden Prüfung HTTP 404. Eine lokale HTTP-200-Antwort belegt keine
 Veröffentlichung. [Konkrete Freigabe und Live-Abnahme](PUBLISHING.md).
+
+
+## Finale Informationswebsite · 08.10.2026
+
+Die vorstehenden Entwurfsprüfungen sind historische Belege. Der finale
+Stand setzt `status: published` für die Website, entfernt Entwurfs- und
+Apple-Abstimmungstexte aus dem Kundenfluss und enthält auf der Startseite
+den Hinweis „Noch nicht im App Store verfügbar“. Die Betreiberkonfiguration,
+CSS und Assets bleiben unverändert. Gemeinsame Website-/Support-Betreiber
+sind von einer späteren Store-Verkäuferrolle ausdrücklich getrennt.
+Cloud-, Backup-, Dateischutz- und Löschungsrisiken bleiben vollständig im
+Datenschutz beschrieben. Apples Auslegung wird in LEGAL-NOTES geführt.
+
+Nach Änderung erneut 17 Tests bestanden (`Ran 17 tests in 0.578s`, `OK`),
+regulärer und Vorschau-Build erfolgreich. Alle fünf regulär gebauten Seiten
+haben keine Entwurfsmarkierung, kein `noindex`, keine unaufgelösten
+Platzhalter und keine Apple-Abstimmungsdiskussion. Alle fünf Vorschauseiten
+tragen weiterhin den Builder-Vorschauhinweis. Acht öffentliche Dateien
+bleiben unverändert im Umfang. Freigabe und Live-Abnahme stehen aus.

@@ -1,13 +1,36 @@
-# Health Export · Grundlage und offene Freigaben
+# Health Export · Grundlage und Veröffentlichungsgrenzen
 
-Stand: 08.10.2026. Umsetzung als Website-Entwurf; keine Veröffentlichung, Store-Verfügbarkeit, Apple-Freigabe oder bestätigte Verkäufervereinbarung.
+Stand: 08.10.2026. Fertige Informations-, Support- und Datenschutzwebsite zur
+App in Vorbereitung. `status: published` bedeutet eine indexierbare Website
+nach Freigabe/Deploy; keine App-Store-Verfügbarkeit oder Apple-Freigabe.
 
-Betreiber-, Adress-, Support-, Hosting- und Datenschutzangaben stammen ausschließlich aus dem bereits öffentlichen `apps/uebergabe/config.json` und den dortigen Website-Texten. Die Konfiguration wurde nur beim Standdatum angepasst; `appStoreURL` bleibt `null`. Keine privaten Life-OS-Daten.
+Betreiber-, Adress-, Support-, Hosting- und Datenschutzangaben stammen
+vollständig aus der bereits öffentlichen `apps/uebergabe/config.json` und
+den dortigen Website-Texten. Die Konfiguration weicht nur beim Standdatum ab;
+`appStoreURL` bleibt `null`. Die gemeinsamen Website-/Support-Betreiber werden
+nicht mit der rechtlichen Verkäuferrolle im späteren Store-Angebot gleichgesetzt.
+Der vorhandene Company-Publishing-Weg ist für die App gesondert zu bestätigen.
+Keine neue Verkäuferrolle oder Verkäufervereinbarung wird behauptet.
 
-App-Fakten: Store-Metadaten und Datenschutz-/Altersfreigabevorlage vom 08.10.2026. Der frühere private Pflichtseitenentwurf diente ausschließlich als fachliche Grundlage; seine persönliche Publisher-Zuordnung wurde nicht übernommen.
+Die fünf Seiten wurden mit dem aktuellen Produktverhalten abgeglichen:
+HealthKit nur lesend auf zehn Datentypen, Tages-JSON/optionales CSV,
+lokale Einstellungen/Ordner-Bookmark, letzter Exportstatus, temporäre Dateien
+mit vollständigem Dateischutz und mögliche Reste bei Prozessabbruch.
+Fertige Exporte sind unverschlüsselt. Dateianbieter, Synchronisierung,
+lokale Ablage, Backups und separate Löschung bleiben öffentlich beschrieben.
+Support verlangt keine Gesundheitsdateien oder privaten Screenshots.
+Gmail/GitHub Pages sind getrennt von der lokalen App-Verarbeitung beschrieben.
 
-Beschrieben werden lesender HealthKit-Zugriff auf zehn Typen, Tages-JSON/optionales CSV, lokale Einstellungen und Ordner-Bookmark, letzter Exportstatus, temporäre Dateien mit Complete File Protection und mögliche Reste nach Prozessabbruch. Fertige Exporte sind unverschlüsselt. Dateianbieter, Synchronisierung, lokale Ablage und Backups sind gesondert beschrieben. Keine Gesundheitsdateien oder privaten Screenshots für Support anfordern. Gmail und GitHub Pages sind von der lokalen App-Verarbeitung getrennt. Gesetzliche Gewährleistungs- und Haftungsansprüche werden nicht pauschal ausgeschlossen.
+Apple-Auslegung 5.1.3(ii) zu iCloud und 5.1.1(ix) zur Anbieterform,
+appbezogener Store-Vertrags-/Publisherabgleich und finaler Preis bleiben
+Voraussetzungen für App-Verkauf und Einreichung. Sie verhindern keine
+sachliche Veröffentlichung dieser Informationswebsite. Die Kundenhinweise
+versprechen keine Apple-Zulässigkeit von Cloud-Exportzielen. Sollte sich die
+Exportfunktion ändern, müssen Support, Datenschutz und Produkttexte vor der
+App-Veröffentlichung gemeinsam aktualisiert werden.
 
-Vor Veröffentlichung/Verkauf offen: bestätigte App-Store-Anbieter-/Vertragsangaben, endgültiger Preis (derzeit geplant 0,99 € in Deutschland), Entscheidung zu iCloud-Exportzielen nach Apple-Richtlinie 5.1.3 und endgültige Prüfung der Store-Datenschutz-/Altersangaben am finalen Build. Die technischen Builds ersetzen keine rechtliche Freigabe.
-
-`status` bleibt `draft`, sodass alle Seiten `noindex` erhalten; Kontakt- und Rechtsseiten tragen zusätzlich den Builder-Entwurfshinweis. Die Startseite benennt die Vorbereitung ausdrücklich.
+Geplant sind 0,99 € in Deutschland; keine Verfügbarkeit, Store-URL oder
+Download-Schaltfläche. Die Website ist Deutsch, App und Storevorlagen sind
+DE/EN. Für zusätzliche Vertriebssprachen die Verständlichkeit von Support
+und Datenschutz gesondert prüfen. Technische Prüfung ist keine Feststellung
+einer rechtlichen Verkäuferrolle oder Apple-Zulassung.

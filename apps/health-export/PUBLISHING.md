@@ -1,25 +1,26 @@
 # Health Export · Veröffentlichungspaket
 
 Stand: 08.10.2026. Bestehender [PR #1](https://github.com/Schobebro/schobebro.github.io/pull/1),
-Branch `feat/health-export-pages-20261008`. Geprüfter HTML-/Asset-Stand:
-`e4688153bb41cc3e74d3ddfbab98aeaf1a033d8d`; die ergänzte Paketabnahme ändert
-nur Dokumentation. Vor einer Freigabe aktuellen vollständigen PR-Head und
+Branch `feat/health-export-pages-20261008`. Die finale Website-Abnahme
+ist im Prüfnachweis dokumentiert; maßgeblich für die Freigabe ist der
+aktuelle vollständige PR-Head. Vor einer Freigabe aktuellen vollständigen PR-Head und
 seinen grünen CI-Lauf zusammen prüfen. Keine Veröffentlichung ohne Freigabe.
 
 ## Umfang einer Freigabe
 
 Ein Merge nach `main` veröffentlicht über den vorhandenen Pages-Workflow
-sofort die komplette Website-Ausgabe. Auch `status: draft` wird öffentlich
-bereitgestellt. `draft` bedeutet Entwurfshinweise und `noindex`, keine private
-Vorschau. Der PR selbst veröffentlicht nichts.
+sofort die komplette Website-Ausgabe. Der freigabefähige Stand verwendet `status: published`. Der PR selbst
+veröffentlicht nichts.
 
-Dieser Stand ist als öffentlich sichtbare Vorbereitung technisch geprüft.
-Er ist noch keine abschließende Store-Pflichtseitenfreigabe: Alle fünf Seiten
-enthalten Entwurfshinweise; Anbieter-/Vertragsabgleich und die Entscheidung
-über iCloud-Exportziele sind ausdrücklich offen. Empfehlung: Erst diese
-Entscheidungen in Texte/Status übernehmen und erneut prüfen, dann die fertigen
-Pflichtseiten freigeben. Soll vorher die Vorbereitung veröffentlicht werden,
-muss die Freigabe den sichtbaren Entwurf ausdrücklich umfassen.
+Dieser Stand ist als fertige öffentliche Informationswebsite freigabefähig.
+`status: published` entfernt die Builder-Entwurfshinweise; alle fünf Seiten
+sind indexierbar. Die Startseite sagt wahrheitsgemäß, dass die App noch nicht
+im App Store verfügbar ist. Gemeinsame Website-/Support-Betreiber stehen im
+Impressum und Datenschutz; eine rechtliche Store-Verkäuferrolle wird daraus
+nicht abgeleitet. Apple- und Store-Entscheidungen bleiben separate
+Voraussetzungen für App-Einreichung/Verkauf, dokumentiert in
+[LEGAL-NOTES.md](LEGAL-NOTES.md). Empfehlung: Den geprüften PR-Head als
+Informationswebsite freigeben und mergen, dann Deploy und Live-URLs abnehmen.
 
 Die Website ist vollständig Deutsch. DE/EN-App und DE/EN-Storetexte bedeuten
 keine vorhandenen englischen Webseiten. Vor zusätzlichem englischem Vertrieb
@@ -65,7 +66,7 @@ curl --fail --show-error --silent https://schobebro.github.io/health-export/impr
 Alle fünf HTTP-200-Antworten und Health-Export-Inhalte verlangen; keine
 GitHub-404-Seite oder bloße Root-Weiterleitung akzeptieren. Live im Browser
 Navigation, CSS/Icon, Support-Maillinks und Datenschutzanker prüfen.
-Bei endgültigen Pflichtseiten dürfen keine Entwurfshinweise oder offenen
+Es dürfen keine Entwurfshinweise oder offenen
 Anbieterbehauptungen mehr stehen. `noindex` allein verhindert nicht die
 öffentliche Abrufbarkeit.
 
